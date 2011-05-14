@@ -1,0 +1,14 @@
+#!/bin/bash
+FILEPATH=$(cd "$(dirname "$0")"; pwd)/`basename $0`
+if [[ -h $FILEPATH ]]; then
+  REALPATH=`readlink $FILEPATH`
+else
+  REALPATH=$FILEPATH
+fi
+RUNIT_DIR=$(dirname $(dirname $REALPATH))
+source $RUNIT_DIR/config
+## make sure the app is already running
+sv start $APP || exit 1
+## finally load the bluepill
+cd $APP_DIR
+exec bundle exec bluepill --no-privileged -c $BLUEPILL_CONTROL_DIR load $RUNIT_DIR/app.pill

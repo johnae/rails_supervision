@@ -1,0 +1,68 @@
+require 'fileutils'
+
+MACOSX = (RUBY_PLATFORM.downcase =~ /darwin/) ? true : false
+APP_DIR = File.dirname(File.dirname(File.expand_path(__FILE__)))
+APP = ENV.key?('APP') ? ENV['APP'] : File.basename(APP_DIR)
+HOME = MACOSX ? File.dirname(File.dirname(File.expand_path(__FILE__)))+'/tmp' : ENV['HOME']+'/monitoring/'+APP
+SVDIR = ENV.key?('SVDIR') ? ENV['SVDIR'] : nil
+if SVDIR.nil?
+  Object.instance_eval { remove_const :SVDIR }
+  unless MACOSX
+    SVDIR = SVDIR || ENV['HOME']+'/service'
+    SV = '/usr/bin/sv'
+    ENV['SVDIR'] = SVDIR
+  else
+    SVDIR = '/usr/local/var/service'
+    SV = '/usr/local/bin/sv'
+    ENV['SVDIR'] = SVDIR
+  end
+end
+
+FileUtils.mkdir_p "#{HOME}/socks"
+FileUtils.mkdir_p "#{HOME}/pids"
+
+Bluepill.application(APP.to_sym, :base_dir => HOME, :foreground => true) do |app|
+  app.process("unicorn") do |process|
+    
+    process.pid_file = File.join(APP_DIR, 'tmp', 'pids', 'unicorn.pid')
+    process.working_dir = APP_DIR
+
+    process.start_command = <<-EOF
+      '
+      STATE=`cat #{SVDIR}/#{APP}/supervise/stat`
+      if [ "$STATE" != "run" ]; then
+        sleep 5
+      fi
+      STATE=`cat #{SVDIR}/#{APP}/supervise/stat`
+      if [ "$STATE" != "run" ]; then
+        sv stop #{APP}_bluepill
+      else
+        sleep 5
+        sv start #{APP}
+      fi
+      '
+    EOF
+    process.stop_command = "sv stop #{APP}"
+    process.restart_command = "sv hup #{APP}"
+    
+    if MACOSX
+      process.uid = ENV['USER']
+      process.gid = 'staff'
+    else
+      process.uid = process.gid = ENV['USER']
+    end
+    
+    process.start_grace_time = 20.seconds
+    process.stop_grace_time = 5.seconds
+    process.restart_grace_time = 20.seconds
+
+    process.monitor_children do |child_process|
+      child_process.stop_command = "kill -QUIT {{PID}}"
+      
+      ## if 3 out of 4 checks results in a usage of more than 150 megs then kill this unicorn
+      child_process.checks :mem_usage, :every => 10.seconds, :below => 150.megabytes, :times => [3,4], :fires => :stop
+      # if 3 out of 4 checks results in a cpu usage of more than 20 % then kill this unicorn
+      child_process.checks :cpu_usage, :every => 10.seconds, :below => 20, :times => [3,4], :fires => :stop
+    end
+  end
+end

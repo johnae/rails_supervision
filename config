@@ -1,0 +1,41 @@
+#!/bin/bash
+
+export OS=`uname | awk '{print tolower($0)}'`
+
+if [[ "$BASH_SOURCE" == "$0" ]]; then
+  export CONFIG_FILE="${0}"
+else
+  export CONFIG_FILE="${BASH_SOURCE}"
+fi
+
+## this is bash magic, get the dir of this file
+FILEPATH=$(cd "$(dirname "$CONFIG_FILE")"; pwd)/`basename $0`
+if [[ -h $FILEPATH ]]; then
+  REALPATH=`readlink $FILEPATH`
+else
+  REALPATH=$FILEPATH
+fi
+
+export APP_DIR=$(dirname $(dirname $REALPATH))
+export APP=$(basename $APP_DIR)
+
+if [ "${OS}" == "darwin" ]; then
+  export BLUEPILL_LOG_DIR="${APP_DIR}/log/bluepill"
+  export BLUEPILL_CONTROL_DIR="${TMPDIR}bluepill/${APP}"
+  [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
+elif [ "${OS}" == "linux" ]; then
+  export BLUEPILL_LOG_DIR="${HOME}/log/bluepill/${APP}"
+  export BLUEPILL_CONTROL_DIR="${HOME}/var/bluepill/${APP}"
+  export SVDIR=$HOME/service
+  [[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"
+fi
+
+mkdir -p $BLUEPILL_LOG_DIR
+mkdir -p $BLUEPILL_CONTROL_DIR
+
+[[ -s "$HOME/application_environment" ]] && source "$HOME/application_environment"
+[[ -s "$APP_DIR/application_environment" ]] && source "$APP_DIR/application_environment"
+
+export UNICORN_CONFIG=${UNICORN_CONFIG:-'unicorn.dev.conf'}
+export RAILS_ENV=${RAILS_ENV:-'development'}
+
