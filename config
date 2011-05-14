@@ -1,5 +1,5 @@
 #!/bin/bash
-
+test `which sv` || (echo "Please install runit - it's not in my PATH. On Ubuntu 'apt-get runit', on Mac 'brew install runit'" && exit 1)
 export OS=`uname | awk '{print tolower($0)}'`
 
 if [[ "$BASH_SOURCE" == "$0" ]]; then
@@ -22,11 +22,12 @@ export APP=$(basename $APP_DIR)
 if [ "${OS}" == "darwin" ]; then
   export BLUEPILL_LOG_DIR="${APP_DIR}/log/bluepill"
   export BLUEPILL_CONTROL_DIR="${TMPDIR}bluepill/${APP}"
+  export SVDIR=${SVDIR:-"/usr/local/var/service"}
   [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
 elif [ "${OS}" == "linux" ]; then
   export BLUEPILL_LOG_DIR="${HOME}/log/bluepill/${APP}"
   export BLUEPILL_CONTROL_DIR="${HOME}/var/bluepill/${APP}"
-  export SVDIR=$HOME/service
+  export SVDIR=${SVDIR:-"$HOME/service"}
   [[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"
 fi
 
