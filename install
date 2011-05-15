@@ -11,3 +11,4 @@ RUNIT_DIR=$(dirname $REALPATH)
 source $RUNIT_DIR/config
 
 ln -s $RUNIT_DIR/app $SVDIR/$APP_NAME
+ln -s $RUNIT_DIR/bluepill $SVDIR/${APP_NAME}_bluepill

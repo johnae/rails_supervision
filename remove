@@ -11,5 +11,6 @@ RUNIT_DIR=$(dirname $REALPATH)
 source $RUNIT_DIR/config
 
 if [[ -h $SVDIR/$APP_NAME ]]; then
+  rm $SVDIR/${APP_NAME}_bluepill
   rm $SVDIR/$APP_NAME
 fi
