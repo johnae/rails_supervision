@@ -11,4 +11,5 @@ RUNIT_DIR=$(dirname $REALPATH)
 source $RUNIT_DIR/config
 
 cd $RAILS_ROOT
+test `which bluepill` || (echo "Please install bluepill through rubygems if possible for faster execution")
 test `which bluepill` && bluepill --no-privileged -c $BLUEPILL_HOME $* || bundle exec bluepill --no-privileged -c $BLUEPILL_HOME $*
