@@ -10,6 +10,9 @@ Make sure bluepill is listed in your Gemfile and bundle it then:
 
 you should now be able to run
     ./runit/bp status
+    
+above command will most probably be faster if you install bluepill through rubygems (at least if running
+on ruby 1.9.2 which has a serious performance issue with require)
 
 for bluepills status of your app
 

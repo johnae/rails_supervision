@@ -11,4 +11,4 @@ RUNIT_DIR=$(dirname $REALPATH)
 source $RUNIT_DIR/config
 
 cd $RAILS_ROOT
-exec bundle exec bluepill --no-privileged -c $BLUEPILL_HOME $*
+test `which bluepill` && bluepill --no-privileged -c $BLUEPILL_HOME $* || bundle exec bluepill --no-privileged -c $BLUEPILL_HOME $*
