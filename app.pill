@@ -1,9 +1,9 @@
 require 'fileutils'
 
 MACOSX = (RUBY_PLATFORM.downcase =~ /darwin/) ? true : false
-APP_DIR = File.dirname(File.dirname(File.expand_path(__FILE__)))
-APP = ENV.key?('APP') ? ENV['APP'] : File.basename(APP_DIR)
-HOME = MACOSX ? File.dirname(File.dirname(File.expand_path(__FILE__)))+'/tmp' : ENV['HOME']+'/monitoring/'+APP
+RAILS_ROOT = ENV.key?('RAILS_ROOT') ? ENV['RAILS_ROOT'] : File.dirname(File.dirname(File.expand_path(__FILE__)))
+APP_NAME = ENV.key?('APP_NAME') ? ENV['APP_NAME'] : File.basename(RAILS_ROOT)
+BLUEPILL_HOME = RAILS_ROOT+'/tmp/bluepill'
 MAX_PROCESS_RAM = ENV.key?('MAX_PROCESS_RAM') ? ENV['MAX_PROCESS_RAM'].to_i : 150
 MAX_PROCESS_CPU = ENV.key?('MAX_PROCESS_CPU') ? ENV['MAX_PROCESS_CPU'].to_i : 20
 
@@ -13,42 +13,40 @@ else
   if MACOSX
     ## when using brew
     SVDIR = '/usr/local/var/service'
-    SV = '/usr/local/bin/sv'
     ENV['SVDIR'] = SVDIR
   else
     ## only tested on ubuntu
     SVDIR = SVDIR || ENV['HOME']+'/service'
-    SV = '/usr/bin/sv'
     ENV['SVDIR'] = SVDIR
   end
 end
 
-FileUtils.mkdir_p "#{HOME}/socks"
-FileUtils.mkdir_p "#{HOME}/pids"
+FileUtils.mkdir_p "#{BLUEPILL_HOME}/socks"
+FileUtils.mkdir_p "#{BLUEPILL_HOME}/pids"
 
-Bluepill.application(APP.to_sym, :base_dir => HOME, :foreground => true) do |app|
+Bluepill.application(APP_NAME.to_sym, :base_dir => BLUEPILL_HOME, :foreground => true) do |app|
   app.process("unicorn") do |process|
     
-    process.pid_file = File.join(APP_DIR, 'tmp', 'pids', 'unicorn.pid')
-    process.working_dir = APP_DIR
+    process.pid_file = File.join(RAILS_ROOT, 'tmp', 'pids', 'unicorn.pid')
+    process.working_dir = RAILS_ROOT
 
     process.start_command = <<-EOF
       '
-      STATE=`cat #{SVDIR}/#{APP}/supervise/stat`
+      STATE=`cat #{SVDIR}/#{APP_NAME}/supervise/stat`
       if [ "$STATE" != "run" ]; then
         sleep 5
       fi
-      STATE=`cat #{SVDIR}/#{APP}/supervise/stat`
+      STATE=`cat #{SVDIR}/#{APP_NAME}/supervise/stat`
       if [ "$STATE" != "run" ]; then
-        sv stop #{APP}_bluepill
+        sv stop #{APP_NAME}_bluepill
       else
         sleep 5
-        sv start #{APP}
+        sv start #{APP_NAME}
       fi
       '
     EOF
-    process.stop_command = "sv stop #{APP}"
-    process.restart_command = "sv hup #{APP}"
+    process.stop_command = "sv stop #{APP_NAME}"
+    process.restart_command = "sv hup #{APP_NAME}"
     
     if MACOSX
       process.uid = ENV['USER']

@@ -9,7 +9,7 @@
 # up with a new pid etc.
 #
 
-## this is bash magic, get the dir of this file
+## this is bash magic, get the dir of this file - works on OS X and Linux
 FILEPATH=$(cd "$(dirname "$0")"; pwd)/`basename $0`
 if [[ -h $FILEPATH ]]; then
   REALPATH=`readlink $FILEPATH`
@@ -30,7 +30,7 @@ function is_pid_running() {
 
 echo "My pid: $$"
 
-CUR_PID_FILE=$APP_DIR/tmp/pids/unicorn.pid
+CUR_PID_FILE=$RAILS_ROOT/tmp/pids/unicorn.pid
 OLD_PID_FILE=$CUR_PID_FILE.oldbin
 
 if [ -e $OLD_PID_FILE ]; then
@@ -52,7 +52,7 @@ fi
 
 if [ ! $RUNNING ]; then
     echo "Starting unicorn"
-	  cd $APP_DIR
+	  cd $RAILS_ROOT
     bundle exec unicorn -c $UNICORN_CONFIG -E $RAILS_ENV -D
     sleep 5
     CUR_PID=$(cat $CUR_PID_FILE)

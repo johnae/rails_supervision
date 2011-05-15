@@ -16,26 +16,29 @@ else
   REALPATH=$FILEPATH
 fi
 
-export APP_DIR=$(dirname $(dirname $REALPATH))
-export APP=$(basename $APP_DIR)
+export RAILS_ROOT=${RAILS_ROOT:-$(dirname $(dirname $REALPATH))}
+export APP_NAME=${APP_NAME:-$(basename $RAILS_ROOT)}
 
 if [ "${OS}" == "darwin" ]; then
-  export BLUEPILL_LOG_DIR="${APP_DIR}/log/bluepill"
-  export BLUEPILL_CONTROL_DIR="${TMPDIR}bluepill/${APP}"
+  export BLUEPILL_LOG_DIR="${RAILS_ROOT}/log/bluepill"
+  export BLUEPILL_CONTROL_DIR="${TMPDIR}bluepill/${APP_NAME}"
+  export BLUEPILL_HOME="${RAILS_ROOT}/tmp/bluepill"
   export SVDIR=${SVDIR:-"/usr/local/var/service"}
   [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
 elif [ "${OS}" == "linux" ]; then
-  export BLUEPILL_LOG_DIR="${HOME}/log/bluepill/${APP}"
-  export BLUEPILL_CONTROL_DIR="${HOME}/var/bluepill/${APP}"
+  export BLUEPILL_LOG_DIR="${HOME}/log/bluepill/${APP_NAME}"
+  export BLUEPILL_CONTROL_DIR="${HOME}/var/bluepill/${APP_NAME}"
+  export BLUEPILL_HOME="${RAILS_ROOT}/tmp/bluepill"
   export SVDIR=${SVDIR:-"$HOME/service"}
   [[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"
 fi
 
 mkdir -p $BLUEPILL_LOG_DIR
-mkdir -p $BLUEPILL_CONTROL_DIR
+mkdir -p $BLUEPILL_CONTROL_DIR ## this doesn't get used when running through runit
+mkdir -p $BLUEPILL_HOME
 
 [[ -s "$HOME/application_environment" ]] && source "$HOME/application_environment"
-[[ -s "$APP_DIR/application_environment" ]] && source "$APP_DIR/application_environment"
+[[ -s "$RAILS_ROOT/application_environment" ]] && source "$RAILS_ROOT/application_environment"
 
 export UNICORN_CONFIG=${UNICORN_CONFIG:-'unicorn.dev.conf'}
 export RAILS_ENV=${RAILS_ENV:-'development'}

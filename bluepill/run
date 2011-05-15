@@ -8,7 +8,7 @@ fi
 RUNIT_DIR=$(dirname $(dirname $REALPATH))
 source $RUNIT_DIR/config
 ## make sure the app is already running
-sv start $APP || exit 1
+sv start $APP_NAME || exit 1
 ## finally load the bluepill
-cd $APP_DIR
+cd $RAILS_ROOT
 exec bundle exec bluepill --no-privileged -c $BLUEPILL_CONTROL_DIR load $RUNIT_DIR/app.pill
