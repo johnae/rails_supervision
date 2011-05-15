@@ -10,5 +10,16 @@ fi
 RUNIT_DIR=$(dirname $REALPATH)
 source $RUNIT_DIR/config
 
-ln -s $RUNIT_DIR/app $SVDIR/$APP_NAME
-ln -s $RUNIT_DIR/bluepill $SVDIR/${APP_NAME}_bluepill
+if [[ ! -h $SVDIR/$APP_NAME ]]; then
+  ln -s $RUNIT_DIR/app $SVDIR/$APP_NAME
+  echo "Installed $SVDIR/$APP_NAME"
+else
+  echo "Did NOT install $SVDIR/$APP_NAME since it was already present"
+fi
+
+if [[ ! -h $SVDIR/${APP_NAME}_bluepill ]]; then
+  ln -s $RUNIT_DIR/bluepill $SVDIR/${APP_NAME}_bluepill
+  echo "Installed $SVDIR/${APP_NAME}_bluepill"
+else
+  echo "Did NOT install $SVDIR/${APP_NAME}_bluepill since it was already present"
+fi

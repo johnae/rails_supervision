@@ -11,6 +11,15 @@ RUNIT_DIR=$(dirname $REALPATH)
 source $RUNIT_DIR/config
 
 if [[ -h $SVDIR/$APP_NAME ]]; then
-  rm $SVDIR/${APP_NAME}_bluepill
   rm $SVDIR/$APP_NAME
+  echo "Removed $SVDIR/$APP_NAME"
+else
+  echo "Could not remove $SVDIR/$APP_NAME since it did not exist or was not a link"
+fi
+
+if [[ -h $SVDIR/${APP_NAME}_bluepill ]]; then
+  rm $SVDIR/${APP_NAME}_bluepill
+  echo "Removed $SVDIR/${APP_NAME}_bluepill"
+else
+  echo "Could not remove $SVDIR/${APP_NAME}_bluepill since it did not exist or was not a link"
 fi
