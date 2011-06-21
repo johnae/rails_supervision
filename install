@@ -1,4 +1,5 @@
 #!/bin/bash
+test `which sv` || (echo "Please install runit - it's not in my PATH. On Ubuntu 'apt-get runit', on Mac 'brew install runit'" && exit 1)
 
 FILEPATH=$(cd "$(dirname "$0")"; pwd)/`basename $0`
 if [[ -h $FILEPATH ]]; then

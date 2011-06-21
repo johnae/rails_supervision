@@ -6,6 +6,7 @@ APP_NAME = ENV.key?('APP_NAME') ? ENV['APP_NAME'] : File.basename(RAILS_ROOT)
 BLUEPILL_HOME = RAILS_ROOT+'/tmp/bluepill'
 MAX_PROCESS_RAM = ENV.key?('MAX_PROCESS_RAM') ? ENV['MAX_PROCESS_RAM'].to_i : 150
 MAX_PROCESS_CPU = ENV.key?('MAX_PROCESS_CPU') ? ENV['MAX_PROCESS_CPU'].to_i : 20
+USER_ID = ENV['UID'].to_i
 
 SVDIR = if ENV.key?('SVDIR')
   ENV['SVDIR']
@@ -16,8 +17,13 @@ else
     ENV['SVDIR'] = SVDIR
   else
     ## only tested on ubuntu
-    SVDIR = SVDIR || ENV['HOME']+'/service'
-    ENV['SVDIR'] = SVDIR
+    unless USER_ID==0
+      SVDIR = SVDIR || ENV['HOME']+'/service'
+      ENV['SVDIR'] = SVDIR
+    else
+      SVDIR = SVDIR || '/etc/service'
+      ENV['SVDIR'] = SVDIR
+    end
   end
 end
 

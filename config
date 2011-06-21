@@ -35,10 +35,11 @@ fi
 mkdir -p $BLUEPILL_LOG_DIR
 mkdir -p $BLUEPILL_CONTROL_DIR ## this doesn't get used when running through runit
 mkdir -p $BLUEPILL_HOME
+mkdir -p $SVDIR
 
 [[ -s "$HOME/application_environment" ]] && source "$HOME/application_environment"
 [[ -s "$RAILS_ROOT/application_environment" ]] && source "$RAILS_ROOT/application_environment"
 
-export UNICORN_CONFIG=${UNICORN_CONFIG:-'unicorn.dev.conf'}
+export UNICORN_CONFIG=${UNICORN_CONFIG:-'unicorn.conf'} ## we only have one conf now so this is always the same really
 export RAILS_ENV=${RAILS_ENV:-'development'}
 
