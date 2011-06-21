@@ -36,23 +36,27 @@ Bluepill.application(APP_NAME.to_sym, :base_dir => BLUEPILL_HOME, :foreground =>
     process.pid_file = File.join(RAILS_ROOT, 'tmp', 'pids', 'unicorn.pid')
     process.working_dir = RAILS_ROOT
 
-    process.start_command = <<-EOF
-      '
-      STATE=`cat #{SVDIR}/#{APP_NAME}/supervise/stat`
-      if [ "$STATE" != "run" ]; then
-        sleep 5
-      fi
-      STATE=`cat #{SVDIR}/#{APP_NAME}/supervise/stat`
-      if [ "$STATE" != "run" ]; then
-        sv stop #{APP_NAME}_bluepill
-      else
-        sleep 5
-        sv start #{APP_NAME}
-      fi
-      '
-    EOF
-    process.stop_command = "sv stop #{APP_NAME}"
-    process.restart_command = "sv hup #{APP_NAME}"
+    process.start_command = 'true'
+    process.stop_command = 'true'
+    process.restart_command = 'true'
+
+    #process.start_command = <<-EOF
+    #  '
+    #  STATE=`cat #{SVDIR}/#{APP_NAME}/supervise/stat`
+    #  if [ "$STATE" != "run" ]; then
+    #    sleep 5
+    #  fi
+    #  STATE=`cat #{SVDIR}/#{APP_NAME}/supervise/stat`
+    #  if [ "$STATE" != "run" ]; then
+    #    sv stop #{APP_NAME}_bluepill
+    #  else
+    #    sleep 5
+    #    sv start #{APP_NAME}
+    #  fi
+    #  '
+    #EOF
+    #process.stop_command = "sv stop #{APP_NAME}"
+    #process.restart_command = "sv hup #{APP_NAME}"
     
     if MACOSX
       process.uid = ENV['USER']
