@@ -1,5 +1,11 @@
 #!/bin/bash
-test `which sv` || echo "Please install runit - it's not in my PATH. On Ubuntu 'apt-get runit', on Mac 'brew install runit'" && exit 1
+
+exit_since_no_runit() {
+	echo "Please install runit - it's not in my PATH. On Ubuntu 'apt-get runit', on Mac 'brew install runit'"
+	exit 1
+}
+
+test `which sv` || exit_since_no_runit
 export OS=`uname | awk '{print tolower($0)}'`
 
 if [[ "$BASH_SOURCE" == "$0" ]]; then
