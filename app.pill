@@ -5,7 +5,7 @@ RAILS_ROOT = ENV.key?('RAILS_ROOT') ? ENV['RAILS_ROOT'] : File.dirname(File.dirn
 APP_NAME = ENV.key?('APP_NAME') ? ENV['APP_NAME'] : File.basename(RAILS_ROOT)
 BLUEPILL_HOME = RAILS_ROOT+'/tmp/bluepill'
 MAX_PROCESS_RAM = ENV.key?('MAX_PROCESS_RAM') ? ENV['MAX_PROCESS_RAM'].to_i : 150
-MAX_PROCESS_CPU = ENV.key?('MAX_PROCESS_CPU') ? ENV['MAX_PROCESS_CPU'].to_i : 20
+MAX_PROCESS_CPU = ENV.key?('MAX_PROCESS_CPU') ? ENV['MAX_PROCESS_CPU'].to_i : 50
 USER_ID = ENV['UID'].to_i
 
 SVDIR = if ENV.key?('SVDIR')
@@ -71,10 +71,10 @@ Bluepill.application(APP_NAME.to_sym, :base_dir => BLUEPILL_HOME, :foreground =>
 
     process.monitor_children do |child_process|
       child_process.stop_command = "kill -QUIT {{PID}}"
-      ## if 6 out of 8 checks results in a usage of more than 150 megs then kill this unicorn
-      child_process.checks :mem_usage, :every => 15.seconds, :below => MAX_PROCESS_RAM.megabytes, :times => [6,8], :fires => :stop
-      # if 6 out of 8 checks results in a cpu usage of more than 20 % then kill this unicorn
-      child_process.checks :cpu_usage, :every => 15.seconds, :below => MAX_PROCESS_CPU, :times => [6,8], :fires => :stop
+      ## if 4 out of 5 checks results in a usage of more than 150 megs then kill this unicorn
+      child_process.checks :mem_usage, :every => 15.seconds, :below => MAX_PROCESS_RAM.megabytes, :times => [4,5], :fires => :stop
+      # if 10 out of 12 checks results in a cpu usage of more than 50 % then kill this unicorn
+      child_process.checks :cpu_usage, :every => 15.seconds, :below => MAX_PROCESS_CPU, :times => [10,12], :fires => :stop
     end
   end
 end
