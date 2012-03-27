@@ -29,13 +29,15 @@ if [ "${OS}" == "darwin" ]; then
   export BLUEPILL_CONTROL_DIR="${TMPDIR}bluepill/${APP_NAME}"
   export BLUEPILL_HOME="${RAILS_ROOT}/tmp/bluepill"
   export SVDIR=${SVDIR:-"/usr/local/var/service"}
-  [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
+  [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+  `which rbenv` && eval "$(rbenv init -)"
 elif [ "${OS}" == "linux" ]; then
   export BLUEPILL_LOG_DIR="${HOME}/log/bluepill/${APP_NAME}"
   export BLUEPILL_CONTROL_DIR="${HOME}/var/bluepill/${APP_NAME}"
   export BLUEPILL_HOME="${RAILS_ROOT}/tmp/bluepill"
   export SVDIR=${SVDIR:-"$HOME/service"}
   [[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"
+  [[ -s "/etc/profile.d/rbenv.sh" ]] && source "/etc/profile.d/rbenv.sh"
 fi
 
 mkdir -p $BLUEPILL_LOG_DIR
