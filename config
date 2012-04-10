@@ -5,6 +5,19 @@ exit_since_no_runit() {
 	exit 1
 }
 
+function defined {
+    [[ ${!1-X} == ${!1-Y} ]]
+}
+
+function has_value {
+    if defined $1; then
+        if [[ -n ${!1} ]]; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
 test `which sv` || exit_since_no_runit
 export OS=`uname | awk '{print tolower($0)}'`
 

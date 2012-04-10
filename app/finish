@@ -10,7 +10,5 @@ RUNIT_DIR=$(dirname $(dirname $REALPATH))
 source $RUNIT_DIR/config
 
 if has_value DEPENDENT_SERVICE; then
-  sv start $DEPENDENT_SERVICE
+  sv stop $DEPENDENT_SERVICE
 fi
-
-exec $RUNIT_DIR/unicorn_runit_run
